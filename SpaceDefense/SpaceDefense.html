@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body{
+            height: 100vh;
+            width: 100vw;
+            text-align: center;
+        }
+        #Screen_ID {
+            background-color: black;
+            height: 720px;
+            width: 720px;
+        }
+        #Start {
+            position: absolute;
+            top: 20px;
+            right: 10vw;
+        }
+        div {
+            position: absolute;
+            top: 15vh;
+            right: 10vw;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="Screen_ID"></canvas>
+    <div>
+    <p>Life :<span id="Health_ID"></span> </p>
+    <p>Score :<span id="Score_id"></span></p>
+    <textarea id="UserInput_ID" rows="1"></textarea>
+    </div>
+    <button type="submit" id="Start" onclick="GameStart()">Start</button>
+</body>
+<script>
+    let Meteor_X = 0;
+    let Meteor_Y = 0;
+    let Problem = "";
+    let Answer = 0;
+    let Meteors = [{x:0,y:0,MeteorProblem:"",MeteorAnswer:0}];
+    let Life = 3;
+    let Input = "";
+    let Score = 0;
+    let Screen_Canvas = document.getElementById("Screen_ID");
+    let Screen_Draw = Screen_Canvas.getContext("2d");
+    const Meteor_Image = new Image();
+    Meteor_Image.src = "Images\\MeteorImage.png";
+
+    function RandomNumberGenerator() {
+        Meteor_X = Math.floor((Math.random()*100)+1);
+        Meteor_Y = -64;
+        ProblemGenerator();
+        Meteors.push({x:Meteor_X,y:Meteor_Y,MeteorProblem:Problem,MeteorAnswer:Answer});
+        Display();
+    }
+
+    function RandomNumberGenerator_NoDisplay() {
+        Meteor_X = Math.floor((Math.random()*100)+1);
+        Meteor_Y = -64;
+        ProblemGenerator();
+        Meteors.push({x:Meteor_X,y:Meteor_Y,MeteorProblem:Problem,MeteorAnswer:Answer});
+    }
+
+    function ProblemGenerator() {
+        var num1 = Math.floor((Math.random()*10)+1);
+        var num2 = Math.floor((Math.random()*10)+1);
+        Problem = String(num1)+"+"+String(num2);
+        Answer = num1 + num2;
+    }
+
+    function Display() {
+        Screen_Draw.clearRect(0, 0, 720, 720);
+        Screen_Draw.font = "20px Arial";
+        Screen_Draw.fillStyle = "white"; 
+        document.getElementById("Health_ID").innerHTML = Life;
+        document.getElementById("Score_id").innerHTML = Score;
+        for(var i = 1; i < Meteors.length; i++) {
+            Screen_Draw.drawImage(Meteor_Image, Meteors[i].x, Meteors[i].y+=0.25, 32,32);
+            Screen_Draw.fillText(Meteors[i].MeteorProblem, Meteors[i].x, Meteors[i].y+20);
+            if(Meteors[i].y%64==0&&Math.random()>0.5) RandomNumberGenerator_NoDisplay();
+            if(Meteors[i].y>=100) {
+                Life--;
+                removeObjectByAttribute(Meteors, 'y', 100);
+            }
+            if(Input == Meteors[i].MeteorAnswer) {
+                removeObjectByAttribute(Meteors, 'MeteorAnswer', Meteors[i].MeteorAnswer);
+                Score += 100;
+                Input = "";
+            }
+        }
+        if(Meteors.length == 1 && Life > 0) RandomNumberGenerator_NoDisplay();
+        if(Life<0) window.alert("Game Over\nYour Score: "+Score);
+        else requestAnimationFrame(Display);
+    }
+
+    document.getElementById("UserInput_ID").addEventListener("keydown", function(event) {
+            // Check if the pressed key is Enter (keyCode 13)
+            if (event.keyCode === 13) {
+                Input = document.getElementById("UserInput_ID").value;
+                document.getElementById("UserInput_ID").value = "";
+            }
+        });
+
+    function removeObjectByAttribute(arr, attribute, value) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+            if (arr[i][attribute] === value) {
+                arr.splice(i, 1);
+            }
+        }
+    }
+
+    function GameStart() {
+        RandomNumberGenerator();
+    }
+</script>
+</html>
