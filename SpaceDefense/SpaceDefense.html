@@ -45,6 +45,8 @@
     let Score = 0;
     let Screen_Canvas = document.getElementById("Screen_ID");
     let Screen_Draw = Screen_Canvas.getContext("2d");
+    const Explosion_Sound = new Audio("Sounds\\muffled-distant-explosion-7104.mp3");
+    const PlayerDamage = new Audio("Sounds\\roblox-death-sound_1.mp3");
     const Meteor_Image = new Image();
     Meteor_Image.src = "Images\\MeteorImage.png";
 
@@ -81,10 +83,12 @@
             Screen_Draw.fillText(Meteors[i].MeteorProblem, Meteors[i].x, Meteors[i].y+20);
             if(Meteors[i].y%64==0&&Math.random()>0.5) RandomNumberGenerator_NoDisplay();
             if(Meteors[i].y>=100) {
+                PlayerDamage.play();
                 Life--;
                 removeObjectByAttribute(Meteors, 'y', 100);
             }
             if(Input == Meteors[i].MeteorAnswer) {
+                Explosion_Sound.play();
                 removeObjectByAttribute(Meteors, 'MeteorAnswer', Meteors[i].MeteorAnswer);
                 Score += 100;
                 Input = "";
